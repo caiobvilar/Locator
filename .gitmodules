@@ -1,3 +1,6 @@
 [submodule "third-party/STM32_ST7789-driver"]
 	path = third-party/STM32_ST7789-driver
 	url = https://github.com/mireq/st7789-stm32-driver
+[submodule "third-party/third-party/STM32_ST7789"]
+	path = third-party/third-party/STM32_ST7789
+	url = https://github.com/caiobvilar/st7789-stm32-driver
