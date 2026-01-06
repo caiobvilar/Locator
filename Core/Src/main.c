@@ -126,13 +126,9 @@ void LCD_FillScreen(uint16_t color) {
   LCD_CS_HIGH();
 }
 
+// ST7789H2 driver I/O callbacks
 int32_t ST7789H2_IO_Init(void) {
-  LCD_CS_HIGH();
-  LCD_DC_HIGH();
-  LCD_RST_LOW();
-  HAL_Delay(10);
-  LCD_RST_HIGH();
-  HAL_Delay(120);
+  // GPIO already initialized manually in main()
   return ST7789H2_OK;
 }
 
@@ -140,44 +136,54 @@ int32_t ST7789H2_IO_DeInit(void) { return ST7789H2_OK; }
 
 int32_t ST7789H2_IO_WriteReg(uint16_t DevAddr, uint16_t Reg, uint8_t *pData,
                              uint32_t Length) {
-  LCD_CS_LOW();
-  LCD_DC_LOW();
-  uint8_t cmd = (uint8_t)Reg;
-  HAL_SPI_Transmit(&hspi1, &cmd, 1, HAL_MAX_DELAY);
+  // Write command
+  LCD_WriteCommand((uint8_t)Reg);
+
+  // Write data if present
   if (Length > 0 && pData != NULL) {
     LCD_DC_HIGH();
+    LCD_CS_LOW();
     HAL_SPI_Transmit(&hspi1, pData, Length, HAL_MAX_DELAY);
+    LCD_CS_HIGH();
   }
-  LCD_CS_HIGH();
   return ST7789H2_OK;
 }
 
 int32_t ST7789H2_IO_ReadReg(uint16_t DevAddr, uint16_t Reg, uint8_t *pData,
                             uint32_t Length) {
-  LCD_CS_LOW();
-  LCD_DC_LOW();
-  uint8_t cmd = (uint8_t)Reg;
-  HAL_SPI_Transmit(&hspi1, &cmd, 1, HAL_MAX_DELAY);
+  LCD_WriteCommand((uint8_t)Reg);
+
   if (Length > 0 && pData != NULL) {
     LCD_DC_HIGH();
+    LCD_CS_LOW();
     HAL_SPI_Receive(&hspi1, pData, Length, HAL_MAX_DELAY);
+    LCD_CS_HIGH();
   }
-  LCD_CS_HIGH();
   return ST7789H2_OK;
 }
 
 int32_t ST7789H2_IO_SendData(uint8_t *pData, uint32_t Length) {
-  LCD_CS_LOW();
-  LCD_DC_HIGH();
-  HAL_SPI_Transmit(&hspi1, pData, Length, HAL_MAX_DELAY);
-  LCD_CS_HIGH();
+  // SendData in ST7789H2 library is used to send commands (first byte)
+  // The first byte is a command, rest are data
+  if (Length > 0 && pData != NULL) {
+    // Send first byte as command
+    LCD_WriteCommand(pData[0]);
+
+    // Send remaining bytes as data if any
+    if (Length > 1) {
+      LCD_DC_HIGH();
+      LCD_CS_LOW();
+      HAL_SPI_Transmit(&hspi1, &pData[1], Length - 1, HAL_MAX_DELAY);
+      LCD_CS_HIGH();
+    }
+  }
   return ST7789H2_OK;
 }
 
 int32_t ST7789H2_IO_GetTick(void) { return (int32_t)HAL_GetTick(); }
 
-void MX_ST7789H2_Init(void) {
-  // Hardware reset
+void LCD_Init(void) {
+  // Hardware reset sequence
   LCD_CS_HIGH();
   LCD_RST_HIGH();
   HAL_Delay(10);
@@ -226,17 +232,12 @@ void MX_ST7789H2_Init(void) {
   LCD_WriteCommand(0x29);
   HAL_Delay(100);
 }
-/* USER CODE END 0 */
 
 /**
  * @brief  The application entry point.
  * @retval int
  */
 int main(void) {
-
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -245,7 +246,7 @@ int main(void) {
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  // Manually configure LEDs immediately after HAL_Init
+  // Manual GPIO initialization BEFORE clock config (critical for stability)
   __HAL_RCC_GPIOD_CLK_ENABLE();
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15;
@@ -254,7 +255,7 @@ int main(void) {
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  // Manually configure LCD control pins (PC1, PC2, PC3)
+  // Manual LCD control pin initialization (PC1=CS, PC2=DC, PC3=RST)
   __HAL_RCC_GPIOC_CLK_ENABLE();
   GPIO_InitStruct.Pin = GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -264,17 +265,16 @@ int main(void) {
   /* USER CODE END Init */
 
   /* Configure the system clock */
-  SystemClock_Config(); // Now using HSI instead of HSE
+  SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  // MX_GPIO_Init();  // Skip - using manual init
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-  MX_ST7789H2_Init();
+  LCD_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -441,51 +441,14 @@ static void MX_GPIO_Init(void) {
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(CS_I2C_SPI_GPIO_Port, CS_I2C_SPI_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(OTG_FS_PowerSwitchOn_GPIO_Port, OTG_FS_PowerSwitchOn_Pin,
-                    GPIO_PIN_SET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD,
-                    LD4_Pin | LD3_Pin | LD5_Pin | LD6_Pin | Audio_RST_Pin,
+  HAL_GPIO_WritePin(GPIOD, LD4_Pin | LD3_Pin | LD5_Pin | LD6_Pin,
                     GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, GPIO_PIN_SET);
 
-  /*Configure GPIO pin : DATA_Ready_Pin */
-  GPIO_InitStruct.Pin = DATA_Ready_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(DATA_Ready_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PA0 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0;
-  GPIO_InitStruct.Mode = GPIO_MODE_EVT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : I2S3_WS_Pin */
-  GPIO_InitStruct.Pin = I2S3_WS_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF6_SPI3;
-  HAL_GPIO_Init(I2S3_WS_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : CLK_IN_Pin PB12 */
-  GPIO_InitStruct.Pin = CLK_IN_Pin | GPIO_PIN_12;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : LD4_Pin LD3_Pin LD5_Pin LD6_Pin
-                           Audio_RST_Pin */
-  GPIO_InitStruct.Pin = LD4_Pin | LD3_Pin | LD5_Pin | LD6_Pin | Audio_RST_Pin;
+  /*Configure GPIO pins : LD4_Pin LD3_Pin LD5_Pin LD6_Pin */
+  GPIO_InitStruct.Pin = LD4_Pin | LD3_Pin | LD5_Pin | LD6_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
