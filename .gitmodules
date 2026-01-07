@@ -2,5 +2,5 @@
 	path = third-party/STM32_ST7789-driver
 	url = https://github.com/mireq/st7789-stm32-driver
 [submodule "third-party/STM32_ST7789H2"]
-	path = third-party/STM32_ST7789H2
+	path = BSP/STM32_ST7789H2
 	url = https://github.com/caiobvilar/stm32-st7789h2
