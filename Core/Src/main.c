@@ -17,48 +17,14 @@
  */
 #include "main.h"
 
-#include "st7789h2.h"
-
-#define LCD_WIDTH 240
-#define LCD_HEIGHT 320
-
-// LCD control pin definitions
-#define LCD_CS_Pin GPIO_PIN_1
-#define LCD_CS_GPIO_Port GPIOC
-#define LCD_DC_Pin GPIO_PIN_2
-#define LCD_DC_GPIO_Port GPIOC
-#define LCD_RST_Pin GPIO_PIN_3
-#define LCD_RST_GPIO_Port GPIOC
-
 SPI_HandleTypeDef hspi1;
 
 ST7789H2_Object_t hst7789h2;
 
-// LCD control macros
-#define LCD_CS_LOW()                                                           \
-  HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_RESET)
-#define LCD_CS_HIGH()                                                          \
-  HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET)
-#define LCD_DC_LOW()                                                           \
-  HAL_GPIO_WritePin(LCD_DC_GPIO_Port, LCD_DC_Pin, GPIO_PIN_RESET)
-#define LCD_DC_HIGH()                                                          \
-  HAL_GPIO_WritePin(LCD_DC_GPIO_Port, LCD_DC_Pin, GPIO_PIN_SET)
-#define LCD_RST_LOW()                                                          \
-  HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_RESET)
-#define LCD_RST_HIGH()                                                         \
-  HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET)
-/* USER CODE END PV */
-
-/* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
-/* USER CODE BEGIN PFP */
 
-/* USER CODE END PFP */
-
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
 void LCD_WriteCommand(uint8_t cmd) {
   LCD_DC_LOW();
   LCD_CS_LOW();
@@ -233,51 +199,19 @@ void LCD_Init(void) {
  */
 int main(void) {
 
-  /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick.
-   */
   HAL_Init();
-
-  /* USER CODE BEGIN Init */
-  // Manual GPIO initialization BEFORE clock config (critical for stability)
-  __HAL_RCC_GPIOD_CLK_ENABLE();
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-  GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
-  // Manual LCD control pin initialization (PC1=CS, PC2=DC, PC3=RST)
-  // MUST be done before clock config for stability
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  GPIO_InitStruct.Pin = GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-  /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
   /* Initialize all configured peripherals */
+  MX_GPIO_Init();
   MX_SPI1_Init();
-  /* USER CODE BEGIN 2 */
+
   LCD_Init();
-  /* USER CODE END 2 */
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
   while (1) {
-    /* USER CODE END WHILE */
 
-    /* USER CODE BEGIN 3 */
     // LD3 ON - Red
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12 | GPIO_PIN_14 | GPIO_PIN_15,
@@ -334,7 +268,6 @@ int main(void) {
     LCD_FillScreen(0x0000); // Black
     HAL_Delay(500);
   }
-  /* USER CODE END 3 */
 }
 
 /**

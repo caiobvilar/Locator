@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2026 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.h
+ * @brief          : Header for main.c file.
+ *                   This file contains the common defines of the application.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2026 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -29,6 +29,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 
+#include "st7789h2.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -125,7 +126,34 @@ void Error_Handler(void);
 #define Audio_SDA_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
+#define LCD_WIDTH 240
+#define LCD_HEIGHT 320
 
+// LCD control pin definitions
+#define LCD_CS_Pin GPIO_PIN_1
+#define LCD_CS_GPIO_Port GPIOC
+#define LCD_DC_Pin GPIO_PIN_2
+#define LCD_DC_GPIO_Port GPIOC
+#define LCD_RST_Pin GPIO_PIN_3
+#define LCD_RST_GPIO_Port GPIOC
+
+extern SPI_HandleTypeDef hspi1;
+
+extern ST7789H2_Object_t hst7789h2;
+
+// LCD control macros
+#define LCD_CS_LOW()                                                           \
+  HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_RESET)
+#define LCD_CS_HIGH()                                                          \
+  HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET)
+#define LCD_DC_LOW()                                                           \
+  HAL_GPIO_WritePin(LCD_DC_GPIO_Port, LCD_DC_Pin, GPIO_PIN_RESET)
+#define LCD_DC_HIGH()                                                          \
+  HAL_GPIO_WritePin(LCD_DC_GPIO_Port, LCD_DC_Pin, GPIO_PIN_SET)
+#define LCD_RST_LOW()                                                          \
+  HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_RESET)
+#define LCD_RST_HIGH()                                                         \
+  HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET)
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
