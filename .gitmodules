@@ -4,3 +4,6 @@
 [submodule "BSP/STM32_ST7789H2"]
 	path = BSP/STM32_ST7789H2
 	url = https://github.com/caiobvilar/stm32-st7789h2
+[submodule "BSP/ST7789-STM32"]
+	path = BSP/ST7789-STM32
+	url = https://github.com/caiobvilar/ST7789-STM32
