@@ -1,11 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
 
-#
-# This file is generated only once,
-# and is not re-generated if converter is called multiple times.
-#
-# User is free to modify the file as much as necessary
-#
 
 # Setup compiler settings
 set(CMAKE_C_STANDARD 11)
@@ -38,7 +32,8 @@ add_executable(${CMAKE_PROJECT_NAME})
 add_subdirectory(cmake/stm32cubemx)
 
 # Add STM32 Modules and third-party libraries
-add_subdirectory(third-party/STM32_ST7789H2)
+add_subdirectory(BSP/STM32_ST7789H2)
+
 
 # Link directories setup
 target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
@@ -48,16 +43,28 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
+    App/main.c
+    Board/STM32F411E/TFT-SPI-2-GTM020-02/f411E_lcd.c
+    # Assets - Add generated .c files here (e.g., Assets/logo.c)
 )
 
 # Add include paths
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
+    App
+    Board/STM32F411E/TFT-SPI-2-GTM020-02
     # Add user defined include paths
 )
 
 # Add project symbols (macros)
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined symbols
+)
+
+# Add compile options for GCC 14+ compatibility
+target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE
+    -Wno-error=implicit-function-declaration
+    -Wno-error=int-conversion
+    -Wno-error=incompatible-pointer-types
 )
 
 # Remove wrong libob.a library dependency when using cpp files
@@ -74,5 +81,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 # Generate .bin file from .elf
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${CMAKE_PROJECT_NAME}.bin
+    COMMAND ${CMAKE_COMMAND} -E touch $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
+    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_PROJECT_NAME}.bin
     COMMENT "Generating ${CMAKE_PROJECT_NAME}.bin"
 )

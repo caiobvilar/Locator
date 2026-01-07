@@ -29,10 +29,9 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 
-#include "st7789h2.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "st7789h2.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
