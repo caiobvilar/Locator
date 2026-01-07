@@ -15,22 +15,10 @@
  *
  ******************************************************************************
  */
-/* USER CODE END Header */
-/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
 #include "st7789h2.h"
-/* USER CODE END Includes */
 
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
 #define LCD_WIDTH 240
 #define LCD_HEIGHT 320
 
@@ -41,17 +29,9 @@
 #define LCD_DC_GPIO_Port GPIOC
 #define LCD_RST_Pin GPIO_PIN_3
 #define LCD_RST_GPIO_Port GPIOC
-/* USER CODE END PD */
 
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
-/* Private variables ---------------------------------------------------------*/
 SPI_HandleTypeDef hspi1;
 
-/* USER CODE BEGIN PV */
 ST7789H2_Object_t hst7789h2;
 
 // LCD control macros
@@ -128,7 +108,47 @@ void LCD_FillScreen(uint16_t color) {
 
 // ST7789H2 driver I/O callbacks
 int32_t ST7789H2_IO_Init(void) {
-  // GPIO already initialized manually in main()
+  // Manual initialization sequence (proven to work with this display)
+  // Software reset
+  LCD_WriteCommand(0x01);
+  HAL_Delay(150);
+
+  // Sleep out
+  LCD_WriteCommand(0x11);
+  HAL_Delay(120);
+
+  // Color mode - 16bit RGB565
+  LCD_WriteCommand(0x3A);
+  LCD_WriteData(0x55);
+
+  // Memory data access control
+  LCD_WriteCommand(0x36);
+  LCD_WriteData(0x00); // Normal orientation
+
+  // Column address set (0 to 239)
+  LCD_WriteCommand(0x2A);
+  LCD_WriteData(0x00);
+  LCD_WriteData(0x00);
+  LCD_WriteData(0x00);
+  LCD_WriteData(0xEF);
+
+  // Row address set (0 to 319)
+  LCD_WriteCommand(0x2B);
+  LCD_WriteData(0x00);
+  LCD_WriteData(0x00);
+  LCD_WriteData(0x01);
+  LCD_WriteData(0x3F);
+
+  // Display inversion on
+  LCD_WriteCommand(0x21);
+
+  // Normal display mode
+  LCD_WriteCommand(0x13);
+
+  // Display on
+  LCD_WriteCommand(0x29);
+  HAL_Delay(100);
+
   return ST7789H2_OK;
 }
 
@@ -183,7 +203,7 @@ int32_t ST7789H2_IO_SendData(uint8_t *pData, uint32_t Length) {
 int32_t ST7789H2_IO_GetTick(void) { return (int32_t)HAL_GetTick(); }
 
 void LCD_Init(void) {
-  // Hardware reset sequence
+  // Hardware reset sequence (must be done before registering callbacks)
   LCD_CS_HIGH();
   LCD_RST_HIGH();
   HAL_Delay(10);
@@ -192,45 +212,19 @@ void LCD_Init(void) {
   LCD_RST_HIGH();
   HAL_Delay(120);
 
-  // Software reset
-  LCD_WriteCommand(0x01);
-  HAL_Delay(150);
+  // Register I/O callbacks for ST7789H2 driver
+  // io.Init contains our manual initialization sequence
+  ST7789H2_IO_t io;
+  io.Init = ST7789H2_IO_Init;
+  io.DeInit = ST7789H2_IO_DeInit;
+  io.Address = 0;
+  io.WriteReg = ST7789H2_IO_WriteReg;
+  io.ReadReg = ST7789H2_IO_ReadReg;
+  io.SendData = ST7789H2_IO_SendData;
+  io.GetTick = ST7789H2_IO_GetTick;
 
-  // Sleep out
-  LCD_WriteCommand(0x11);
-  HAL_Delay(120);
-
-  // Color mode - 16bit RGB565
-  LCD_WriteCommand(0x3A);
-  LCD_WriteData(0x55);
-
-  // Memory data access control
-  LCD_WriteCommand(0x36);
-  LCD_WriteData(0x00); // Normal orientation
-
-  // Column address set (0 to 239)
-  LCD_WriteCommand(0x2A);
-  LCD_WriteData(0x00);
-  LCD_WriteData(0x00);
-  LCD_WriteData(0x00);
-  LCD_WriteData(0xEF);
-
-  // Row address set (0 to 319)
-  LCD_WriteCommand(0x2B);
-  LCD_WriteData(0x00);
-  LCD_WriteData(0x00);
-  LCD_WriteData(0x01);
-  LCD_WriteData(0x3F);
-
-  // Display inversion on
-  LCD_WriteCommand(0x21);
-
-  // Normal display mode
-  LCD_WriteCommand(0x13);
-
-  // Display on
-  LCD_WriteCommand(0x29);
-  HAL_Delay(100);
+  // This will call io.Init() which executes our manual initialization
+  ST7789H2_RegisterBusIO(&hst7789h2, &io);
 }
 
 /**
@@ -256,6 +250,7 @@ int main(void) {
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   // Manual LCD control pin initialization (PC1=CS, PC2=DC, PC3=RST)
+  // MUST be done before clock config for stability
   __HAL_RCC_GPIOC_CLK_ENABLE();
   GPIO_InitStruct.Pin = GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
