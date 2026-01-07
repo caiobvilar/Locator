@@ -4,7 +4,7 @@ Debug/
 Release/
 RelWithDebInfo/
 MinSizeRel/
-
+Assets/
 # CMake generated files
 CMakeCache.txt
 CMakeFiles/

@@ -46,12 +46,14 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     App/main.c
     Board/STM32F411E/TFT-SPI-2-GTM020-02/f411E_lcd.c
     # Assets - Add generated .c files here (e.g., Assets/logo.c)
+    Assets/image_240x320_bmp.c
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
     App
     Board/STM32F411E/TFT-SPI-2-GTM020-02
+    Assets
     # Add user defined include paths
 )
 
