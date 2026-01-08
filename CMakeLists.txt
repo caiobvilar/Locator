@@ -30,7 +30,16 @@ add_executable(${CMAKE_PROJECT_NAME})
 
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
+add_subdirectory(BSP/ST7789VW-Generic_Driver)
 
+# Add include paths to st7789 library
+target_include_directories(st7789 PRIVATE
+    Board/STM32F411E/TFT-SPI-2-GTM020-02
+    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Inc
+)
+
+# Link st7789 library with STM32 drivers
+target_link_libraries(st7789 PRIVATE stm32cubemx)
 # Add STM32 Modules and third-party libraries
 # Use ST7789-STM32 driver sources directly
 
@@ -43,7 +52,8 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
-    App/main.c
+    App/app_main.c
+    App/Display.c
     Board/STM32F411E/TFT-SPI-2-GTM020-02/f411E_lcd.c
     # Assets - Add generated .c files here (e.g., Assets/logo.c)
     Assets/image_240x320_bmp.c
@@ -75,6 +85,7 @@ list(REMOVE_ITEM CMAKE_C_IMPLICIT_LINK_LIBRARIES ob)
 # Add linked libraries
 target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
+    st7789
     # Add user defined libraries
 )
 
