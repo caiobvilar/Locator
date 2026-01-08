@@ -31,7 +31,6 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "st7789h2.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -65,14 +64,6 @@ void Error_Handler(void);
 #define INT1_GPIO_Port GPIOE
 #define INT2_Pin GPIO_PIN_5
 #define INT2_GPIO_Port GPIOE
-#define PC14_OSC32_IN_Pin GPIO_PIN_14
-#define PC14_OSC32_IN_GPIO_Port GPIOC
-#define PC15_OSC32_OUT_Pin GPIO_PIN_15
-#define PC15_OSC32_OUT_GPIO_Port GPIOC
-#define PH0_OSC_IN_Pin GPIO_PIN_0
-#define PH0_OSC_IN_GPIO_Port GPIOH
-#define PH1_OSC_OUT_Pin GPIO_PIN_1
-#define PH1_OSC_OUT_GPIO_Port GPIOH
 #define OTG_FS_PowerSwitchOn_Pin GPIO_PIN_0
 #define OTG_FS_PowerSwitchOn_GPIO_Port GPIOC
 #define PDM_OUT_Pin GPIO_PIN_3
@@ -124,35 +115,6 @@ void Error_Handler(void);
 #define Audio_SDA_Pin GPIO_PIN_9
 #define Audio_SDA_GPIO_Port GPIOB
 
-/* USER CODE BEGIN Private defines */
-#define LCD_WIDTH 240
-#define LCD_HEIGHT 320
-
-// LCD control pin definitions
-#define LCD_CS_Pin GPIO_PIN_1
-#define LCD_CS_GPIO_Port GPIOC
-#define LCD_DC_Pin GPIO_PIN_2
-#define LCD_DC_GPIO_Port GPIOC
-#define LCD_RST_Pin GPIO_PIN_3
-#define LCD_RST_GPIO_Port GPIOC
-
-extern SPI_HandleTypeDef hspi1;
-
-extern ST7789H2_Object_t hst7789h2;
-
-// LCD control macros
-#define LCD_CS_LOW()                                                           \
-  HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_RESET)
-#define LCD_CS_HIGH()                                                          \
-  HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET)
-#define LCD_DC_LOW()                                                           \
-  HAL_GPIO_WritePin(LCD_DC_GPIO_Port, LCD_DC_Pin, GPIO_PIN_RESET)
-#define LCD_DC_HIGH()                                                          \
-  HAL_GPIO_WritePin(LCD_DC_GPIO_Port, LCD_DC_Pin, GPIO_PIN_SET)
-#define LCD_RST_LOW()                                                          \
-  HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_RESET)
-#define LCD_RST_HIGH()                                                         \
-  HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET)
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

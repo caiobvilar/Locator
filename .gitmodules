@@ -7,3 +7,6 @@
 [submodule "BSP/ST7789-STM32"]
 	path = BSP/ST7789-STM32
 	url = https://github.com/caiobvilar/ST7789-STM32
+[submodule "BSP/ST7789VW-Generic_Driver"]
+	path = BSP/ST7789VW-Generic_Driver
+	url = https://github.com/caiobvilar/ST7789VW-Generic-Driver

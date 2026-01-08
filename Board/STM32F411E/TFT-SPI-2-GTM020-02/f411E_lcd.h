@@ -1,7 +1,6 @@
 #ifndef F411E_LCD_H
 #define F411E_LCD_H
 
-#include "st7789h2.h"
 #include "stm32f4xx_hal.h"
 
 #define LCD_WIDTH 240
@@ -17,7 +16,11 @@
 
 extern SPI_HandleTypeDef hspi1;
 
-extern ST7789H2_Object_t hst7789h2;
+/* Orientation constants mapped to ST7789 rotations (0-3) */
+#define LCD_ORIENTATION_PORTRAIT 2
+#define LCD_ORIENTATION_LANDSCAPE 1
+#define LCD_ORIENTATION_PORTRAIT_ROT180 0
+#define LCD_ORIENTATION_LANDSCAPE_ROT180 3
 
 // LCD control macros
 #define LCD_CS_LOW()                                                           \
@@ -41,5 +44,9 @@ void LCD_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 void LCD_FillScreen(uint16_t color);
 void LCD_DrawBitmap(uint16_t x, uint16_t y, uint8_t *pBmp);
 void LCD_Init(void);
+void LCD_SetOrientation(uint32_t orientation);
+void LCD_DrawPixel(uint16_t x, uint16_t y, uint16_t color);
+void LCD_FillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
+                  uint16_t color);
 
 #endif // F411E_LCD_H

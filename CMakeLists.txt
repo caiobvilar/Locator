@@ -32,7 +32,7 @@ add_executable(${CMAKE_PROJECT_NAME})
 add_subdirectory(cmake/stm32cubemx)
 
 # Add STM32 Modules and third-party libraries
-add_subdirectory(BSP/STM32_ST7789H2)
+# Use ST7789-STM32 driver sources directly
 
 
 # Link directories setup
@@ -75,8 +75,6 @@ list(REMOVE_ITEM CMAKE_C_IMPLICIT_LINK_LIBRARIES ob)
 # Add linked libraries
 target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
-    STM32_ST7789H2
-
     # Add user defined libraries
 )
 

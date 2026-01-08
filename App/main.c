@@ -1,15 +1,15 @@
 #include "main.h"
 #include "app_main.h"
-#include "f411E_lcd.h" // your board BSP
+#include "f411E_lcd.h" // board BSP using ST7789-STM32 driver
 
 void App_Main(void) {
   // Hardware initialization is done in main.c before calling App_Main
   LCD_Init();
-  
+
   // Test: Fill screen with white to verify LCD is working
   LCD_FillScreen(0xFFFF); // White
   HAL_Delay(2000);
-  
+
   while (1) {
     // LD3 ON - Orange LED
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
