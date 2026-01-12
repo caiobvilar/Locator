@@ -25,7 +25,19 @@ void
 Display_FillScreen(uint16_t color)
 {
     st7789_t* lcd = display_handle();
-    st7789_fill_rect(lcd, 0, 0, LCD_WIDTH, LCD_HEIGHT, color);
+
+    uint16_t w = LCD_WIDTH;
+    uint16_t h = LCD_HEIGHT;
+
+    // TEMP: adapt to current orientation
+    if (lcd->orientation == ST7789_ORIENT_LANDSCAPE || lcd->orientation == ST7789_ORIENT_LANDSCAPE_INV)
+    {
+        uint16_t tmp = w;
+        w = h;
+        h = tmp;
+    }
+
+    st7789_fill_rect(lcd, 0, 0, w, h, color);
 }
 
 void
