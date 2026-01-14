@@ -4,8 +4,6 @@ Debug/
 Release/
 RelWithDebInfo/
 MinSizeRel/
-.cache/
-.settings/
 Assets/
 # CMake generated files
 CMakeCache.txt
@@ -15,6 +13,8 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps/
+.settings/
+.vscode/
 
 # Build artifacts
 *.elf
