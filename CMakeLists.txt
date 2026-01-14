@@ -30,19 +30,10 @@ add_executable(${CMAKE_PROJECT_NAME})
 
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
+
+# Add st7789 display driver library (disable SPI port since we have our own implementation)
+set(ST7789_ENABLE_SPI_PORT OFF CACHE BOOL "" FORCE)
 add_subdirectory(BSP/ST7789VW-Generic_Driver)
-
-# Add include paths to st7789 library
-target_include_directories(st7789 PRIVATE
-    Board/STM32F411E/TFT-SPI-2-GTM020-02
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Inc
-)
-
-# Link st7789 library with STM32 drivers
-target_link_libraries(st7789 PRIVATE stm32cubemx)
-# Add STM32 Modules and third-party libraries
-# Use ST7789-STM32 driver sources directly
-
 
 # Link directories setup
 target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
@@ -51,12 +42,14 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-    # Add user sources here
+    Core/Src/main.c
+
     App/app_main.c
     App/Display.c
-    Board/STM32F411E/TFT-SPI-2-GTM020-02/f411E_lcd.c
-    # Assets - Add generated .c files here (e.g., Assets/logo.c)
     Assets/image_240x320_bmp.c
+
+    Board/STM32F411E/TFT-SPI-2-GTM020-02/f411E_lcd.c
+    Board/STM32F411E/TFT-SPI-2-GTM020-02/st7789_port_f411e_spi.c
 )
 
 # Add include paths
@@ -89,10 +82,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     # Add user defined libraries
 )
 
-# Generate .bin file from .elf
+# Add post-build command to generate binary file
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${CMAKE_PROJECT_NAME}.bin
-    COMMAND ${CMAKE_COMMAND} -E touch $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
-    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_PROJECT_NAME}.bin
-    COMMENT "Generating ${CMAKE_PROJECT_NAME}.bin"
+    COMMAND arm-none-eabi-objcopy -O binary ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.elf ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.bin
+    COMMENT "Converting ${CMAKE_PROJECT_NAME}.elf to ${CMAKE_PROJECT_NAME}.bin"
 )
