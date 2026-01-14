@@ -1,4 +1,5 @@
 #include "f411E_lcd.h"
+#include "st7789.h"
 
 /* Single driver instance */
 static st7789_t lcd;
@@ -18,6 +19,7 @@ LCD_Init(void)
 {
     st7789_port_init_f411_spi(&lcd); /* fill callbacks + geometry */
     (void)st7789_init(&lcd);
+    LCD_SetOrientation(LCD_ORIENTATION_PORTRAIT_ROT180);
 }
 
 void

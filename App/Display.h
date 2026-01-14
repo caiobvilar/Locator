@@ -13,6 +13,12 @@
 #define COLOR_CYAN RGB565(0, 255, 255)
 #define COLOR_MAGENTA RGB565(255, 0, 255)
 
+uint16_t
+Display_GetWidth(void);
+
+uint16_t
+Display_GetHeight(void);
+
 void
 Display_Init(void);
 void
