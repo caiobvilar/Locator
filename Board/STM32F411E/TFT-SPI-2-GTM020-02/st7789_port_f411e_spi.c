@@ -70,23 +70,13 @@ hal_write_cmd1(uint8_t cmd, uint8_t data)
 {
     uint8_t buf[2] = {cmd, data};
 
-    /* MADCTL (0x36) needs special handling - both bytes with DC=1 */
-    if (cmd == 0x36)
-    {
-        spi_cs_low();
-        spi_dc_data();
-        spi_write(buf, 2);
-        spi_cs_high();
-    }
-    else
-    {
-        /* All other commands: command with DC=0, parameter with DC=0 */
-        spi_cs_low();
-        spi_dc_cmd();
-        spi_write(&buf[0], 1);
-        spi_write(&buf[1], 1);
-        spi_cs_high();
-    }
+    /* All other commands: command with DC=0, parameter with DC=0 */
+    spi_cs_low();
+    spi_dc_cmd();
+    spi_write(&buf[0], 1); // DC = 0: command
+    spi_dc_data();
+    spi_write(&buf[1], 1); // DC = 1: parameter
+    spi_cs_high();
 }
 
 static void

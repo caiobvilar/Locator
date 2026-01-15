@@ -2,6 +2,7 @@
 
 #include "app_main.h"
 #include "Display.h"
+#include "f411E_lcd.h"
 #include "main.h"
 
 void
@@ -10,7 +11,7 @@ App_Main(void)
     // Hardware init done before this
 
     Display_Init();
-    Display_SetOrientation(0); // or LCD_ORIENTATION_LANDSCAPE if you expose it
+    Display_SetOrientation(LCD_ORIENTATION_LANDSCAPE_ROT180); // or LCD_ORIENTATION_LANDSCAPE if you expose it
 
     uint16_t w = Display_GetWidth();
     uint16_t h = Display_GetHeight();
@@ -24,7 +25,7 @@ App_Main(void)
     // Some convenient reference points
     uint16_t margin = w / 12; // ~20px on 240‑wide
     uint16_t mid_x = w / 2;
-    uint16_t mid_y = h / 2;
+    // uint16_t mid_y = h / 2;
     uint16_t near_max = w - margin;
     uint16_t low_y = h - (h / 4);
     uint16_t high_y = h / 4;

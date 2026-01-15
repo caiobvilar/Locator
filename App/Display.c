@@ -13,13 +13,13 @@ handle(void)
 uint16_t
 Display_GetWidth(void)
 {
-    return LCD_WIDTH;
+    return handle().width;
 }
 
 uint16_t
 Display_GetHeight(void)
 {
-    return LCD_HEIGHT;
+    return handle().height;
 }
 
 void
