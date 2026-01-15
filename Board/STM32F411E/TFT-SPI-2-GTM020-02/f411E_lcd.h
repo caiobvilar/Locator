@@ -37,7 +37,7 @@ void
 LCD_Init(void);
 void
 LCD_SetOrientation(uint32_t orientation);
-st7789_t
+st7789_t*
 F411E_LCD_GetHandle(void);
 
 #endif

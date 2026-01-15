@@ -4,10 +4,10 @@
 /* Single driver instance */
 static st7789_t lcd;
 
-st7789_t
+st7789_t*
 F411E_LCD_GetHandle(void)
 {
-    return lcd;
+    return &lcd;
 }
 
 /* Prototype for the board port init we just created */

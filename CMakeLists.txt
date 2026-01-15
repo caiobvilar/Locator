@@ -47,6 +47,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     App/app_main.c
     App/Display.c
     Assets/image_240x320_bmp.c
+    Assets/Fonts5x7.c
 
     Board/STM32F411E/TFT-SPI-2-GTM020-02/f411E_lcd.c
     Board/STM32F411E/TFT-SPI-2-GTM020-02/st7789_port_f411e_spi.c

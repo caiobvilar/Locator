@@ -1,5 +1,8 @@
-// App/Display.h
-#pragma once
+
+#ifndef DISPLAY_H
+#define DISPLAY_H
+
+#include <Fonts5x7.h>
 #include <stdint.h>
 
 // RGB color macros for convenience (converts to RGB565)
@@ -36,3 +39,10 @@ Display_DrawLineThickRGB(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uin
                          uint16_t thickness);
 void
 Display_DrawRulersRGB(uint8_t r, uint8_t g, uint8_t b, uint16_t thickness);
+void
+Display_DrawChar(uint16_t x, uint16_t y, uint16_t color, char c);
+
+void
+Display_DrawString(uint16_t x, uint16_t y, uint16_t color, const char* s);
+
+#endif /*DISPLAY_H*/
